@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/osuthailand/api/common"
+	"github.com/osu-datenshi/api/common"
 	"github.com/jmoiron/sqlx"
 	"gopkg.in/thehowl/go-osuapi.v1"
 )

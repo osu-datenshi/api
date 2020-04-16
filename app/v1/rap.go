@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/osuthailand/api/common"
+	"github.com/osu-datenshi/api/common"
 )
 
 type rapLogData struct {

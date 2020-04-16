@@ -6,8 +6,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/osuthailand/api/common"
-	"github.com/osuthailand/api/limit"
+	"github.com/osu-datenshi/api/common"
+	"github.com/osu-datenshi/api/limit"
 )
 
 type rankRequestsStatusResponse struct {

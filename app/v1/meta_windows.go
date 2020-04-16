@@ -5,7 +5,7 @@ package v1
 import (
 	"time"
 
-	"github.com/osuthailand/api/common"
+	"github.com/osu-datenshi/api/common"
 )
 
 // MetaRestartGET restarts the API with Zero Downtime™.

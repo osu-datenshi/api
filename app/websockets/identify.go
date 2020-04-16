@@ -8,7 +8,7 @@ import (
 
 	"database/sql"
 
-	"github.com/osuthailand/api/common"
+	"github.com/osu-datenshi/api/common"
 )
 
 type websocketUser struct {

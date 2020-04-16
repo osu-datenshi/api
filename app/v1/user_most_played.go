@@ -1,7 +1,7 @@
 package v1
 
 import (
-	"github.com/osuthailand/api/common"
+	"github.com/osu-datenshi/api/common"
 )
 
 type mostPlayedBeatmap struct {

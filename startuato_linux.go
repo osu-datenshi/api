@@ -10,7 +10,7 @@ import (
 
 	"github.com/rcrowley/goagain"
 	"github.com/valyala/fasthttp"
-	"github.com/osuthailand/api/common"
+	"github.com/osu-datenshi/api/common"
 	"zxq.co/ripple/schiavolib"
 )
 

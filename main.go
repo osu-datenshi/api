@@ -7,9 +7,9 @@ import (
 	"syscall"
 
 	"zxq.co/ripple/agplwarning"
-	"github.com/osuthailand/api/app"
-	"github.com/osuthailand/api/beatmapget"
-	"github.com/osuthailand/api/common"
+	"github.com/osu-datenshi/api/app"
+	"github.com/osu-datenshi/api/beatmapget"
+	"github.com/osu-datenshi/api/common"
 	"zxq.co/ripple/schiavolib"
 	// Golint pls dont break balls
 	_ "github.com/go-sql-driver/mysql"
@@ -31,7 +31,7 @@ func init() {
 var db *sqlx.DB
 
 func main() {
-	err := agplwarning.Warn("ripple", "Ainu & Homura API")
+	err := agplwarning.Warn("ripple", "API DATENSHI")
 	if err != nil {
 		fmt.Println(err)
 	}

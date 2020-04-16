@@ -3,7 +3,7 @@ package v1
 import (
 	"database/sql"
 
-	"github.com/osuthailand/api/common"
+	"github.com/osu-datenshi/api/common"
 )
 
 type singleBadge struct {

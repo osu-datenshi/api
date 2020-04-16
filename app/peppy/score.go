@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/osuthailand/api/common"
+	"github.com/osu-datenshi/api/common"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/valyala/fasthttp"

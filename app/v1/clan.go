@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"sort"
 	"strconv"
-	"github.com/osuthailand/api/common"
+	"github.com/osu-datenshi/api/common"
 )
 
 type singleClan struct {

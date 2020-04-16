@@ -9,7 +9,7 @@ import (
 	"github.com/buaazp/fasthttprouter"
 	"github.com/jmoiron/sqlx"
 	"github.com/valyala/fasthttp"
-	"github.com/osuthailand/api/common"
+	"github.com/osu-datenshi/api/common"
 )
 
 type router struct {

@@ -5,7 +5,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/osuthailand/api/common"
+	"github.com/osu-datenshi/api/common"
 	"gopkg.in/thehowl/go-osuapi.v1"
 )
 

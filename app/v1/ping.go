@@ -4,7 +4,7 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/osuthailand/api/common"
+	"github.com/osu-datenshi/api/common"
 )
 
 var rn = rand.New(rand.NewSource(time.Now().UnixNano()))

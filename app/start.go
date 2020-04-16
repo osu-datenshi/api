@@ -9,11 +9,11 @@ import (
 	"github.com/getsentry/raven-go"
 	"github.com/jmoiron/sqlx"
 	"gopkg.in/redis.v5"
-	"github.com/osuthailand/api/app/internals"
-	"github.com/osuthailand/api/app/peppy"
-	v1 "github.com/osuthailand/api/app/v1"
-	"github.com/osuthailand/api/app/websockets"
-	"github.com/osuthailand/api/common"
+	"github.com/osu-datenshi/api/app/internals"
+	"github.com/osu-datenshi/api/app/peppy"
+	v1 "github.com/osu-datenshi/api/app/v1"
+	"github.com/osu-datenshi/api/app/websockets"
+	"github.com/osu-datenshi/api/common"
 	
 	//Add-on
 	"github.com/Hazuki-san/hmrapi"
