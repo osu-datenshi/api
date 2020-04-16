@@ -16,7 +16,7 @@ import (
 	"github.com/osu-datenshi/api/common"
 	
 	//Add-on
-	"github.com/Hazuki-san/hmrapi"
+	"github.com/osu-datenshi/hmrapi"
 	"github.com/denmarkistrash/mitsuha"
 )
 

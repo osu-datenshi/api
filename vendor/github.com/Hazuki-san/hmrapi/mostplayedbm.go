@@ -1,7 +1,7 @@
 package hmrapi
 
 import (
-	"github.com/osuthailand/api/common"
+	"github.com/osu-datenshi/api/common"
 )
 
 type difficulty struct {

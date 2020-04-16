@@ -4,7 +4,7 @@ import (
 	"strings"
 	"strconv"
 	"fmt"
-	"github.com/osuthailand/api/common"
+	"github.com/osu-datenshi/api/common"
 	"time"
 	"gopkg.in/thehowl/go-osuapi.v1"
 	"zxq.co/x/getrank"
