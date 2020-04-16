@@ -17,7 +17,7 @@ import (
 	
 	//Add-on
 	"github.com/osu-datenshi/hmrapi"
-	"github.com/denmarkistrash/mitsuha"
+	"github.com/osu-datenshi/mitsuha"
 )
 
 var (
