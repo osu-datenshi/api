@@ -2,19 +2,19 @@ package app
 
 import (
 	"fmt"
+	"gopkg.in/redis.v5"
 	"time"
 
 	"github.com/DataDog/datadog-go/statsd"
 	fhr "github.com/buaazp/fasthttprouter"
 	"github.com/getsentry/raven-go"
 	"github.com/jmoiron/sqlx"
-	"gopkg.in/redis.v5"
 	"github.com/osu-datenshi/api/app/internals"
 	"github.com/osu-datenshi/api/app/peppy"
 	v1 "github.com/osu-datenshi/api/app/v1"
 	"github.com/osu-datenshi/api/app/websockets"
 	"github.com/osu-datenshi/api/common"
-	
+
 	//Add-on
 	"github.com/osu-datenshi/hmrapi"
 	"github.com/osu-datenshi/mitsuha"
@@ -153,7 +153,7 @@ func Start(conf common.Conf, dbO *sqlx.DB) *fhr.Router {
 		r.POSTMethod("/api/v1/tokens/fix_privileges", v1.TokenFixPrivilegesPOST,
 			common.PrivilegeManageUser, common.PrivilegeAPIMeta)
 	}
-	
+
 	// Ainu & Homura API
 	{
 		r.Method("/api/v1/users/followers", mitsuha.FollowersGetResponse)
@@ -169,7 +169,6 @@ func Start(conf common.Conf, dbO *sqlx.DB) *fhr.Router {
 		r.Method("/api/v1/users/get_activity", hmrapi.LogsGET)
 		r.Method("/api/v1/mitsuha/followers_friends", mitsuha.FollowersGET)
 	}
-
 
 	// Websocket API
 	{
