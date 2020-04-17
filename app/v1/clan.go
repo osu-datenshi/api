@@ -3,9 +3,9 @@ package v1
 import (
 	"database/sql"
 	"fmt"
+	"github.com/osu-datenshi/api/common"
 	"sort"
 	"strconv"
-	"github.com/osu-datenshi/api/common"
 )
 
 type singleClan struct {
@@ -133,20 +133,49 @@ func AllClanStatsGET(md common.MethodData) common.CodeMessager {
 
 		rid := r.Clans[i].ID
 
-		err := md.DB.Select(&members.Members, `SELECT users.id, users.username, users.register_datetime, users.privileges,
-		latest_activity, users_stats.username_aka,
-		
-		users_stats.country, users_stats.user_color,
-		users_stats.ranked_score_std, users_stats.total_score_std, users_stats.pp_std,users_stats.playcount_std, users_stats.replays_watched_std, users_stats.total_hits_std,
-		users_stats.ranked_score_taiko, users_stats.total_score_taiko, users_stats.pp_taiko, users_stats.playcount_taiko, users_stats.replays_watched_taiko,users_stats.total_hits_taiko,
-		users_stats.ranked_score_ctb, users_stats.total_score_ctb, users_stats.pp_ctb, users_stats.playcount_ctb, users_stats.replays_watched_ctb, users_stats.total_hits_ctb,
-		users_stats.ranked_score_mania, users_stats.total_score_mania, users_stats.pp_mania, users_stats.playcount_mania, users_stats.replays_watched_mania, users_stats.total_hits_mania
-		
-		FROM user_clans uc
-		INNER JOIN users
-		ON users.id = uc.user
-		INNER JOIN users_stats ON users_stats.id = uc.user
-		WHERE clan = ? AND privileges & 1 = 1
+		err := md.DB.Select(&members.Members, `
+SELECT users.id,
+       users.username,
+       users.register_datetime,
+       users.privileges,
+       latest_activity,
+       mixed_stats.*
+FROM user_clans uc
+         INNER JOIN users ON users.id = uc.user
+         INNER JOIN (
+    SELECT us.id,
+           us.username_aka,
+           us.country,
+           us.user_color,
+           (us.ranked_score_std + rs.ranked_score_std)           ranked_score_std,
+           (us.total_score_std + rs.total_score_std)             total_score_std,
+           ROUND((us.pp_std + rs.pp_std) / 2)                    pp_std,
+           (us.playcount_std + rs.playcount_std)                 playcount_std,
+           (us.replays_watched_std + rs.replays_watched_std)     replays_watched_std,
+           (us.total_hits_std + rs.total_hits_std)               total_hits_std,
+           (us.ranked_score_taiko + rs.ranked_score_taiko)       ranked_score_taiko,
+           (us.total_score_taiko + rs.total_score_taiko)         total_score_taiko,
+           ROUND((us.pp_taiko + rs.pp_taiko) / 2)                pp_taiko,
+           (us.playcount_taiko + rs.playcount_taiko)             playcount_taiko,
+           (us.replays_watched_taiko + rs.replays_watched_taiko) replays_watched_taiko,
+           (us.total_hits_taiko + rs.total_hits_taiko)           total_hits_taiko,
+           (us.ranked_score_ctb + rs.ranked_score_ctb)           ranked_score_ctb,
+           (us.total_score_ctb + rs.total_score_ctb)             total_score_ctb,
+           ROUND((us.pp_ctb + rs.pp_ctb) / 2)                    pp_ctb,
+           (us.playcount_ctb + rs.playcount_ctb)                 playcount_ctb,
+           (us.replays_watched_ctb + rs.replays_watched_ctb)     replays_watched_ctb,
+           (us.total_hits_ctb + rs.total_hits_ctb)               total_hits_ctb,
+           (us.ranked_score_mania + rs.ranked_score_mania)       ranked_score_mania,
+           (us.total_score_mania + rs.total_score_mania)         total_score_mania,
+           (us.pp_mania + rs.pp_mania)                           pp_mania,
+           (us.playcount_mania + rs.playcount_mania)             playcount_mania,
+           (us.replays_watched_mania + rs.replays_watched_mania) replays_watched_mania,
+           (us.total_hits_mania + rs.total_hits_mania)           total_hits_mania
+    FROM users_stats us
+             INNER JOIN rx_stats rs on us.id = rs.id
+) mixed_stats ON mixed_stats.id = uc.user
+WHERE clan = ?
+  AND privileges & 1 = 1
 		`, rid)
 
 		if err != nil {
@@ -252,20 +281,49 @@ func TotalClanStatsGET(md common.MethodData) common.CodeMessager {
 
 		rid := r.Clans[i].ID
 
-		err := md.DB.Select(&members.Members, `SELECT users.id, users.username, users.register_datetime, users.privileges,
-		latest_activity, users_stats.username_aka,
-		
-		users_stats.country, users_stats.user_color,
-		users_stats.ranked_score_std, users_stats.total_score_std, users_stats.pp_std, users_stats.playcount_std, users_stats.replays_watched_std, users_stats.total_hits_std,
-		users_stats.ranked_score_taiko, users_stats.total_score_taiko, users_stats.pp_taiko, users_stats.playcount_taiko, users_stats.replays_watched_taiko, users_stats.total_hits_taiko,
-		users_stats.ranked_score_ctb, users_stats.total_score_ctb, users_stats.pp_ctb, users_stats.playcount_ctb, users_stats.replays_watched_ctb, users_stats.total_hits_ctb,
-		users_stats.ranked_score_mania, users_stats.total_score_mania, users_stats.pp_mania, users_stats.playcount_mania, users_stats.replays_watched_mania, users_stats.total_hits_mania
-		
-		FROM user_clans uc
-		INNER JOIN users
-		ON users.id = uc.user
-		INNER JOIN users_stats ON users_stats.id = uc.user
-		WHERE clan = ? AND privileges & 1 = 1
+		err := md.DB.Select(&members.Members, `
+SELECT users.id,
+       users.username,
+       users.register_datetime,
+       users.privileges,
+       latest_activity,
+       mixed_stats.*
+FROM user_clans uc
+         INNER JOIN users ON users.id = uc.user
+         INNER JOIN (
+    SELECT us.id,
+           us.username_aka,
+           us.country,
+           us.user_color,
+           (us.ranked_score_std + rs.ranked_score_std)           ranked_score_std,
+           (us.total_score_std + rs.total_score_std)             total_score_std,
+           ROUND((us.pp_std + rs.pp_std) / 2)                    pp_std,
+           (us.playcount_std + rs.playcount_std)                 playcount_std,
+           (us.replays_watched_std + rs.replays_watched_std)     replays_watched_std,
+           (us.total_hits_std + rs.total_hits_std)               total_hits_std,
+           (us.ranked_score_taiko + rs.ranked_score_taiko)       ranked_score_taiko,
+           (us.total_score_taiko + rs.total_score_taiko)         total_score_taiko,
+           ROUND((us.pp_taiko + rs.pp_taiko) / 2)                pp_taiko,
+           (us.playcount_taiko + rs.playcount_taiko)             playcount_taiko,
+           (us.replays_watched_taiko + rs.replays_watched_taiko) replays_watched_taiko,
+           (us.total_hits_taiko + rs.total_hits_taiko)           total_hits_taiko,
+           (us.ranked_score_ctb + rs.ranked_score_ctb)           ranked_score_ctb,
+           (us.total_score_ctb + rs.total_score_ctb)             total_score_ctb,
+           ROUND((us.pp_ctb + rs.pp_ctb) / 2)                    pp_ctb,
+           (us.playcount_ctb + rs.playcount_ctb)                 playcount_ctb,
+           (us.replays_watched_ctb + rs.replays_watched_ctb)     replays_watched_ctb,
+           (us.total_hits_ctb + rs.total_hits_ctb)               total_hits_ctb,
+           (us.ranked_score_mania + rs.ranked_score_mania)       ranked_score_mania,
+           (us.total_score_mania + rs.total_score_mania)         total_score_mania,
+           (us.pp_mania + rs.pp_mania)                           pp_mania,
+           (us.playcount_mania + rs.playcount_mania)             playcount_mania,
+           (us.replays_watched_mania + rs.replays_watched_mania) replays_watched_mania,
+           (us.total_hits_mania + rs.total_hits_mania)           total_hits_mania
+    FROM users_stats us
+             INNER JOIN rx_stats rs on us.id = rs.id
+) mixed_stats ON mixed_stats.id = uc.user
+WHERE clan = ?
+  AND privileges & 1 = 1
 		`, rid)
 
 		if err != nil {
@@ -386,8 +444,8 @@ type imFoolish struct {
 	Invite string `json:"invite"`
 }
 type adminClan struct {
-	Id int `json:"user"`
-	Perms   int `json:"perms"`
+	Id    int `json:"user"`
+	Perms int `json:"perms"`
 }
 
 func ClanInviteGET(md common.MethodData) common.CodeMessager {
@@ -423,13 +481,14 @@ func ClanMembersGET(md common.MethodData) common.CodeMessager {
 	latest_activity, users_stats.username_aka,
 	
 	users_stats.country, users_stats.user_color,
-	users_stats.ranked_score_std, users_stats.total_score_std, users_stats.pp_std, users_stats.playcount_std, users_stats.replays_watched_std, users_stats.total_hits_std,
-	users_stats.ranked_score_taiko, users_stats.total_score_taiko, users_stats.pp_taiko, users_stats.playcount_taiko, users_stats.replays_watched_taiko, users_stats.total_hits_taiko
+	users_stats.ranked_score_std, users_stats.total_score_std, ROUND((users_stats.pp_std + rx_stats.pp_std)/2) pp_std, users_stats.playcount_std, users_stats.replays_watched_std, users_stats.total_hits_std,
+	users_stats.ranked_score_taiko, users_stats.total_score_taiko, ROUND((users_stats.pp_taiko + rx_stats.pp_taiko)/2) pp_taiko, users_stats.playcount_taiko, users_stats.replays_watched_taiko, users_stats.total_hits_taiko
 	
 FROM user_clans uc
 INNER JOIN users
 ON users.id = uc.user
 INNER JOIN users_stats ON users_stats.id = uc.user
+INNER JOIN rx_stats ON rx_stats.id = uc.user
 WHERE clan = ?
 ORDER BY id ASC `, i)
 
@@ -447,13 +506,14 @@ ORDER BY id ASC `, i)
 	latest_activity, users_stats.username_aka,
 	
 	users_stats.country, users_stats.user_color,
-	users_stats.ranked_score_std, users_stats.total_score_std, users_stats.pp_std, users_stats.playcount_std, users_stats.replays_watched_std,
-	users_stats.ranked_score_taiko, users_stats.total_score_taiko, users_stats.pp_taiko, users_stats.playcount_taiko, users_stats.replays_watched_taiko
+	users_stats.ranked_score_std, users_stats.total_score_std, ROUND((users_stats.pp_std + rx_stats.pp_std)/2) pp_std, users_stats.playcount_std, users_stats.replays_watched_std,
+	users_stats.ranked_score_taiko, users_stats.total_score_taiko, ROUND((users_stats.pp_taiko + rx_stats.pp_taiko)/2) pp_taiko, users_stats.playcount_taiko, users_stats.replays_watched_taiko
 	
 FROM user_clans uc
 INNER JOIN users
 ON users.id = uc.user
 INNER JOIN users_stats ON users_stats.id = uc.user
+INNER JOIN rx_stats ON rx_stats.id = uc.user
 WHERE clan = ? AND perms = ?
 ORDER BY id ASC `, i, r)
 
