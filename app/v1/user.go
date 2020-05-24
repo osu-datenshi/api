@@ -17,7 +17,7 @@ type userData struct {
 	Username       string               `json:"username"`
 	UsernameAKA    string               `json:"username_aka"`
 	RegisteredOn   common.UnixTimestamp `json:"registered_on"`
-	Privileges     uint64               `json:"privileges"`
+	Privileges     int64               `json:"privileges"`
 	LatestActivity common.UnixTimestamp `json:"latest_activity"`
 	Country        string               `json:"country"`
 }
@@ -155,10 +155,10 @@ type whatIDResponse struct {
 func UserWhatsTheIDGET(md common.MethodData) common.CodeMessager {
 	var (
 		r          whatIDResponse
-		privileges uint64
+		privileges int64
 	)
 	err := md.DB.QueryRow("SELECT id, privileges FROM users WHERE username_safe = ? LIMIT 1", common.SafeUsername(md.Query("name"))).Scan(&r.ID, &privileges)
-	if err != nil || ((privileges&uint64(common.UserPrivilegePublic)) == 0 &&
+	if err != nil || ((privileges&int64(common.UserPrivilegePublic)) == 0 &&
 		(md.User.UserPrivileges&common.AdminPrivilegeManageUsers == 0)) {
 		return common.SimpleResponse(404, "That user could not be found!")
 	}
@@ -174,8 +174,8 @@ var modesToReadable = [...]string{
 }
 
 type modeData struct {
-	RankedScore            uint64  `json:"ranked_score"`
-	TotalScore             uint64  `json:"total_score"`
+	RankedScore            int64  `json:"ranked_score"`
+	TotalScore             int64  `json:"total_score"`
 	PlayCount              int     `json:"playcount"`
 	PlayTime               int     `json:"play_time"`
 	ReplaysWatched         int     `json:"replays_watched"`
@@ -212,30 +212,30 @@ type userNotFullResponse struct {
 	Username       string               `json:"username"`
 	UsernameAKA    string               `json:"username_aka"`
 	RegisteredOn   common.UnixTimestamp `json:"registered_on"`
-	Privileges     uint64               `json:"privileges"`
+	Privileges     int64               `json:"privileges"`
 	LatestActivity common.UnixTimestamp `json:"latest_activity"`
 	Country        string               `json:"country"`
 	UserColor        string               `json:"user_color"`
-	RankedScoreStd            uint64  `json:"ranked_score_std"`
-	TotalScoreStd             uint64  `json:"total_score_std"`
+	RankedScoreStd            int64  `json:"ranked_score_std"`
+	TotalScoreStd             int64  `json:"total_score_std"`
 	PlaycountStd              int     `json:"playcount_std"`
 	ReplaysWatchedStd         int     `json:"replays_watched_std"`
 	TotalHitsStd              int     `json:"total_hits_std"`
 	PpStd                     int     `json:"pp_std"`
-	RankedScoreTaiko            uint64  `json:"ranked_score_taiko"`
-	TotalScoreTaiko             uint64  `json:"total_score_taiko"`
+	RankedScoreTaiko            int64  `json:"ranked_score_taiko"`
+	TotalScoreTaiko             int64  `json:"total_score_taiko"`
 	PlaycountTaiko              int     `json:"playcount_taiko"`
 	ReplaysWatchedTaiko         int     `json:"replays_watched_taiko"`
 	TotalHitsTaiko              int     `json:"total_hits_taiko"`
 	PpTaiko                     int     `json:"pp_taiko"`
-	RankedScoreCtb            uint64  `json:"ranked_score_ctb"`
-	TotalScoreCtb            uint64  `json:"total_score_ctb"`
+	RankedScoreCtb            int64  `json:"ranked_score_ctb"`
+	TotalScoreCtb            int64  `json:"total_score_ctb"`
 	PlaycountCtb              int     `json:"playcount_ctb"`
 	ReplaysWatchedCtb         int     `json:"replays_watched_ctb"`
 	TotalHitsCtb              int     `json:"total_hits_ctb"`
 	PpCtb                     int     `json:"pp_ctb"`
-	RankedScoreMania            uint64  `json:"ranked_score_mania"`
-	TotalScoreMania             uint64  `json:"total_score_mania"`
+	RankedScoreMania            int64  `json:"ranked_score_mania"`
+	TotalScoreMania             int64  `json:"total_score_mania"`
 	PlaycountMania              int     `json:"playcount_mania"`
 	ReplaysWatchedMania         int     `json:"replays_watched_mania"`
 	TotalHitsMania              int     `json:"total_hits_mania"`
