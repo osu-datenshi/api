@@ -74,7 +74,6 @@ func main() {
 	beatmapget.DB = db
 
 	engine := app.Start(conf, db)
-
 	startuato(engine.Handler)
 }
 
