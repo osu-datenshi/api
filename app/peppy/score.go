@@ -10,7 +10,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/valyala/fasthttp"
 	"gopkg.in/thehowl/go-osuapi.v1"
-	"zxq.co/x/getrank"
+	"github.com/osu-datenshi/getrank"
 )
 
 // GetScores retrieve information about the top 100 scores of a specified beatmap.
