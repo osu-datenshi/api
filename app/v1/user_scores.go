@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"gopkg.in/thehowl/go-osuapi.v1"
+	"github.com/jmoiron/sqlx"
 	"github.com/osu-datenshi/api/common"
 	"github.com/osu-datenshi/getrank"
 )
@@ -91,7 +92,7 @@ func UserScoresBestGET(md common.MethodData) common.CodeMessager {
 		// enforce to vanilla
 		smode = 0
 	}
-	if !md.HasQuery("smode") && common.Int(md.Query("rx")) {
+	if !md.HasQuery("smode") && common.Int(md.Query("rx")) > 0 {
 		// retain old behavior
 		smode = 1
 	}
@@ -146,7 +147,7 @@ func UserScoresRecentGET(md common.MethodData) common.CodeMessager {
 		// enforce to vanilla
 		smode = 0
 	}
-	if !md.HasQuery("smode") && common.Int(md.Query("rx")) {
+	if !md.HasQuery("smode") && common.Int(md.Query("rx")) > 0 {
 		// retain old behavior
 		smode = 1
 	}
@@ -184,7 +185,7 @@ func UserScoresRecentGET(md common.MethodData) common.CodeMessager {
 	}
 }
 
-func genericPuts(rows interface{}, md common.MethodData) common.CodeMessager {
+func genericPuts(rows sqlx.Rows, md common.MethodData) common.CodeMessager {
 	err := nil
 	var scores []userScore
 	for rows.Next() {
