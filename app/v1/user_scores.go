@@ -185,7 +185,7 @@ func UserScoresRecentGET(md common.MethodData) common.CodeMessager {
 	}
 }
 
-func genericPuts(rows sql.Rows, md common.MethodData) common.CodeMessager {
+func genericPuts(rows *sql.Rows, md common.MethodData) common.CodeMessager {
 	err := nil
 	var scores []userScore
 	for rows.Next() {
