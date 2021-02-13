@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"gopkg.in/thehowl/go-osuapi.v1"
-	"github.com/jmoiron/sqlx"
+	"database/sql"
 	"github.com/osu-datenshi/api/common"
 	"github.com/osu-datenshi/getrank"
 )
@@ -185,7 +185,7 @@ func UserScoresRecentGET(md common.MethodData) common.CodeMessager {
 	}
 }
 
-func genericPuts(rows sqlx.Rows, md common.MethodData) common.CodeMessager {
+func genericPuts(rows sql.Rows, md common.MethodData) common.CodeMessager {
 	err := nil
 	var scores []userScore
 	for rows.Next() {
