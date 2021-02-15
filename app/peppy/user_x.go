@@ -13,16 +13,16 @@ import (
 
 // GetUserRecent retrieves an user's recent scores.
 func GetUserRecent(c *fasthttp.RequestCtx, db *sqlx.DB) {
-	getUserX(c, db, "ORDER BY scores.time DESC", common.InString(1, query(c, "limit"), 50, 10))
+	getUserX(c, db, "ORDER BY s.time DESC", common.InString(1, query(c, "limit"), 50, 10))
 }
 
 // GetUserBest retrieves an user's best scores.
 func GetUserBest(c *fasthttp.RequestCtx, db *sqlx.DB) {
 	var sb string
 	if rankable(query(c, "m")) {
-		sb = "scores.pp"
+		sb = "s.pp"
 	} else {
-		sb = "scores.score"
+		sb = "s.score"
 	}
 	getUserX(c, db, "AND completed = '3' ORDER BY "+sb+" DESC", common.InString(1, query(c, "limit"), 100, 10))
 }
@@ -31,15 +31,15 @@ func getUserX(c *fasthttp.RequestCtx, db *sqlx.DB, orderBy string, limit int) {
 	whereClause, p := genUser(c, db)
 	sqlQuery := fmt.Sprintf(
 		`SELECT
-			beatmaps.beatmap_id, scores.score, scores.max_combo,
-			scores.300_count, scores.100_count, scores.50_count,
-			scores.gekis_count, scores.katus_count, scores.misses_count,
-			scores.full_combo, scores.mods, users.id, scores.time,
-			scores.pp, scores.accuracy
-		FROM scores
-		LEFT JOIN beatmaps ON beatmaps.beatmap_md5 = scores.beatmap_md5
-		LEFT JOIN users ON scores.userid = users.id
-		WHERE %s AND scores.play_mode = ? AND users.privileges & 1 > 0
+			b.beatmap_id, s.score, s.max_combo,
+			s.300_count, s.100_count, s.50_count,
+			s.gekis_count, s.katus_count, s.misses_count,
+			s.full_combo, s.mods, users.id, s.time,
+			s.pp, s.accuracy
+		FROM scores_master as s
+		LEFT JOIN b ON using(beatmap_md5)
+		LEFT JOIN u as u ON s.userid = u.id
+		WHERE %s AND s.play_mode = ? AND u.privileges & 1 > 0
 		%s
 		LIMIT %d`, whereClause, orderBy, limit,
 	)

@@ -30,9 +30,9 @@ func GetScores(c *fasthttp.RequestCtx, db *sqlx.DB) {
 		json(c, 200, defaultResponse)
 		return
 	}
-	var sb = "scores.score"
+	var sb = "s.score"
 	if rankable(query(c, "m")) {
-		sb = "scores.pp"
+		sb = "s.pp"
 	}
 	var (
 		extraWhere  string
@@ -46,17 +46,17 @@ func GetScores(c *fasthttp.RequestCtx, db *sqlx.DB) {
 	mods := common.Int(query(c, "mods"))
 	rows, err := db.Query(`
 SELECT
-	scores.id, scores.score, users.username, scores.300_count, scores.100_count,
-	scores.50_count, scores.misses_count, scores.gekis_count, scores.katus_count,
-	scores.max_combo, scores.full_combo, scores.mods, users.id, scores.time, scores.pp,
-	scores.accuracy
-FROM scores
-INNER JOIN users ON users.id = scores.userid
-WHERE scores.completed = '3'
-  AND users.privileges & 1 > 0
-  AND scores.beatmap_md5 = ?
-  AND scores.play_mode = ?
-  AND scores.mods & ? = ?
+	s.id, s.score, u.username, s.300_count, s.100_count,
+	s.50_count, s.misses_count, s.gekis_count, s.katus_count,
+	s.max_combo, s.full_combo, s.mods, users.id, s.time, s.pp,
+	s.accuracy
+FROM scores_master as s
+INNER JOIN users as u ON u.id = s.userid
+WHERE s.completed = '3'
+  AND u.privileges & 1 > 0
+  AND s.beatmap_md5 = ?
+  AND s.play_mode = ?
+  AND s.mods & ? = ?
   `+extraWhere+`
 ORDER BY `+sb+` DESC LIMIT `+strconv.Itoa(common.InString(1, query(c, "limit"), 100, 50)),
 		append([]interface{}{beatmapMD5, genmodei(query(c, "m")), mods, mods}, extraParams...)...)

@@ -260,11 +260,11 @@ func WipeUserPOST(md common.MethodData) common.CodeMessager {
 		if mode < 0 || mode > 3 {
 			continue
 		}
-		_, err = tx.Exec("INSERT INTO scores_removed SELECT * FROM scores WHERE userid = ? AND play_mode = ?", data.ID, mode)
+		_, err = tx.Exec("INSERT INTO scores_removed SELECT * FROM scores_master WHERE userid = ? AND play_mode = ?", data.ID, mode)
 		if err != nil {
 			md.Err(err)
 		}
-		_, err = tx.Exec("DELETE FROM scores WHERE userid = ? AND play_mode = ?", data.ID, mode)
+		_, err = tx.Exec("DELETE FROM scores_master WHERE userid = ? AND play_mode = ?", data.ID, mode)
 		if err != nil {
 			md.Err(err)
 		}

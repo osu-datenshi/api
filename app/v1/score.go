@@ -69,35 +69,35 @@ func ScoresGET(md common.MethodData) common.CodeMessager {
 		}
 		where.Where("beatmap_md5 = ?", md5)
 	}
-	where.In("scores.id", pm("id")...)
+	where.In("s.id", pm("id")...)
 
 	sort := common.Sort(md, common.SortConfiguration{
-		Default: "scores.pp DESC, scores.score DESC",
-		Table:   "scores",
+		Default: "s.pp DESC, s.score DESC",
+		Table:   "s",
 		Allowed: []string{"pp", "score", "accuracy", "id"},
 	})
 	if where.Clause == "" {
 		return ErrMissingField("must specify at least one queried item")
 	}
 
-	where.Where(` scores.completed = '3' AND `+md.User.OnlyUserPublic(false)+` `+
+	where.Where(` s.completed = '3' AND `+md.User.OnlyUserPublic(false)+` `+
 		genModeClause(md)+` `+sort+common.Paginate(md.Query("p"), md.Query("l"), 100), "FIF")
 	where.Params = where.Params[:len(where.Params)-1]
 
 	rows, err := md.DB.Query(`
 SELECT
-	scores.id, scores.beatmap_md5, scores.score,
-	scores.max_combo, scores.full_combo, scores.mods,
-	scores.300_count, scores.100_count, scores.50_count,
-	scores.gekis_count, scores.katus_count, scores.misses_count,
-	scores.time, scores.play_mode, scores.accuracy, scores.pp,
-	scores.completed,
+	s.id, s.beatmap_md5, s.score,
+	s.max_combo, s.full_combo, s.mods,
+	s.300_count, s.100_count, s.50_count,
+	s.gekis_count, s.katus_count, s.misses_count,
+	s.time, s.play_mode, s.accuracy, s.pp,
+	s.completed,
 
-	users.id, users.username, users.register_datetime, users.privileges,
-	users.latest_activity, users_stats.username_aka, users_stats.country
-FROM scores
-INNER JOIN users ON users.id = scores.userid
-INNER JOIN users_stats ON users_stats.id = scores.userid
+	u.id, u.username, u.register_datetime, u.privileges,
+	u.latest_activity, us.username_aka, us.country
+FROM scores_master as s
+INNER JOIN users as u ON u.id = s.userid
+INNER JOIN users_stats as us ON us.id = s.userid
 `+where.Clause, where.Params...)
 	if err != nil {
 		md.Err(err)
@@ -258,7 +258,7 @@ func getMode(m string) string {
 }
 
 func genModeClause(md common.MethodData) string {
-	return genModeClauseColumn(md, "scores.play_mode")
+	return genModeClauseColumn(md, "s.play_mode")
 }
 
 func genModeClauseColumn(md common.MethodData, column string) string {
