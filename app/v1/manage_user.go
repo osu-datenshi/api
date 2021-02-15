@@ -50,8 +50,7 @@ SELECT users.id, users.username, register_datetime, privileges,
 	latest_activity, users_stats.username_aka,
 	users_stats.country
 FROM users
-LEFT JOIN users_stats
-ON users.id=users_stats.id
+LEFT JOIN users_stats ON users.id=users_stats.id
 WHERE users.id=?
 LIMIT 1`
 	return userPutsSingle(md, md.DB.QueryRowx(query, data.UserID))
@@ -207,7 +206,7 @@ func UserEditPOST(md common.MethodData) common.CodeMessager {
 
 	rapLog(md, fmt.Sprintf("has updated user %s", prevUser.Username))
 
-	return userPutsSingle(md, md.DB.QueryRowx(userFields+" WHERE users.id = ? LIMIT 1", data.ID))
+	return userPutsSingle(md, md.DB.QueryRowx(userFields+" WHERE u.id = ? LIMIT 1", data.ID))
 }
 
 func updateBanBancho(r *redis.Client, user int) error {
@@ -289,7 +288,7 @@ func WipeUserPOST(md common.MethodData) common.CodeMessager {
 
 	rapLog(md, fmt.Sprintf("has wiped %s's account", userData.Username))
 
-	return userPutsSingle(md, md.DB.QueryRowx(userFields+" WHERE users.id = ? LIMIT 1", data.ID))
+	return userPutsSingle(md, md.DB.QueryRowx(userFields+" WHERE u.id = ? LIMIT 1", data.ID))
 }
 
 func appendToUserNotes(md common.MethodData, message string, user int) {

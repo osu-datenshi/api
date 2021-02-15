@@ -22,17 +22,17 @@ type userData struct {
 	Country        string               `json:"country"`
 }
 
-const userFields = `SELECT users.id, users.username, register_datetime, users.privileges,
-	latest_activity, users_stats.username_aka,
-	users_stats.country
-FROM users
-INNER JOIN users_stats
-ON users.id=users_stats.id
+const userFields = `SELECT u.id, u.username, register_datetime, u.privileges,
+	latest_activity, us.username_aka,
+	us.country
+FROM users as u
+INNER JOIN users_stats as us
+ON u.id=us.id
 `
 
 // UsersGET is the API handler for GET /users
 func UsersGET(md common.MethodData) common.CodeMessager {
-	shouldRet, whereClause, param := whereClauseUser(md, "users")
+	shouldRet, whereClause, param := whereClauseUser(md, "u")
 	if shouldRet != nil {
 		return userPutsMulti(md)
 	}
@@ -74,22 +74,22 @@ func userPutsMulti(md common.MethodData) common.CodeMessager {
 	pm := md.Ctx.Request.URI().QueryArgs().PeekMulti
 	// query composition
 	wh := common.
-		Where("users.username_safe = ?", common.SafeUsername(md.Query("nname"))).
-		Where("users.id = ?", md.Query("iid")).
-		Where("users.privileges = ?", md.Query("privileges")).
-		Where("users.privileges & ? > 0", md.Query("has_privileges")).
-		Where("users.privileges & ? = 0", md.Query("has_not_privileges")).
-		Where("users_stats.country = ?", md.Query("country")).
-		Where("users_stats.username_aka = ?", md.Query("name_aka")).
-		Where("privileges_groups.name = ?", md.Query("privilege_group")).
-		In("users.id", pm("ids")...).
-		In("users.username_safe", safeUsernameBulk(pm("names"))...).
-		In("users_stats.username_aka", pm("names_aka")...).
-		In("users_stats.country", pm("countries")...)
+		Where("u.username_safe = ?", common.SafeUsername(md.Query("nname"))).
+		Where("u.id = ?", md.Query("iid")).
+		Where("u.privileges = ?", md.Query("privileges")).
+		Where("u.privileges & ? > 0", md.Query("has_privileges")).
+		Where("u.privileges & ? = 0", md.Query("has_not_privileges")).
+		Where("u_stats.country = ?", md.Query("country")).
+		Where("us.username_aka = ?", md.Query("name_aka")).
+		Where("pg.name = ?", md.Query("privilege_group")).
+		In("u.id", pm("ids")...).
+		In("u.username_safe", safeUsernameBulk(pm("names"))...).
+		In("us.username_aka", pm("names_aka")...).
+		In("us.country", pm("countries")...)
 
 	var extraJoin string
 	if md.Query("privilege_group") != "" {
-		extraJoin = " LEFT JOIN privileges_groups ON users.privileges & privileges_groups.privileges = privileges_groups.privileges "
+		extraJoin = " LEFT JOIN privileges_groups as pg ON u.privileges & pg.privileges = pg.privileges "
 	}
 
 	query := userFields + extraJoin + wh.ClauseSafe() + " AND " + md.User.OnlyUserPublic(true) +
@@ -250,7 +250,7 @@ type userNotFullResponse struct {
 
 // RelaxUserFullGET gets all of... bluh.. I'm tired...
 func RelaxUserFullGET(md common.MethodData) common.CodeMessager {
-	shouldRet, whereClause, param := whereClauseUser(md, "users")
+	shouldRet, whereClause, param := whereClauseUser(md, "u")
 	if shouldRet != nil {
 		return *shouldRet
 	}
@@ -258,37 +258,35 @@ func RelaxUserFullGET(md common.MethodData) common.CodeMessager {
 	// Hellest query I've ever done.
 	query := `
 SELECT
-	users.id, users.username, users.register_datetime, users.privileges, users.latest_activity,
+	u.id, u.username, u.register_datetime, u.privileges, u.latest_activity,
 
-	users_stats.username_aka, users_stats.country, users_stats.play_style, users_stats.favourite_mode,
+	us.username_aka, us.country, us.play_style, us.favourite_mode,
 
-	users_stats.custom_badge_icon, users_stats.custom_badge_name, users_stats.can_custom_badge,
-	users_stats.show_custom_badge,
+	us.custom_badge_icon, us.custom_badge_name, us.can_custom_badge,
+	us.show_custom_badge,
 
-	rx_stats.ranked_score_std, rx_stats.total_score_std, rx_stats.playcount_std,
-	users_stats.replays_watched_std, users_stats.total_hits_std,
-	rx_stats.avg_accuracy_std, rx_stats.pp_std, rx_stats.playtime_std,
+	rs.ranked_score_std, rs.total_score_std, rs.playcount_std,
+	us.replays_watched_std, us.total_hits_std,
+	rs.avg_accuracy_std, rs.pp_std, rs.playtime_std,
 
-	rx_stats.ranked_score_taiko, rx_stats.total_score_taiko, rx_stats.playcount_taiko,
-	users_stats.replays_watched_taiko, users_stats.total_hits_taiko,
-	rx_stats.avg_accuracy_taiko, rx_stats.pp_taiko, rx_stats.playtime_taiko,
+	rs.ranked_score_taiko, rs.total_score_taiko, rs.playcount_taiko,
+	us.replays_watched_taiko, us.total_hits_taiko,
+	rs.avg_accuracy_taiko, rs.pp_taiko, rs.playtime_taiko,
 
-	rx_stats.ranked_score_ctb, rx_stats.total_score_ctb, rx_stats.playcount_ctb,
-	users_stats.replays_watched_ctb, users_stats.total_hits_ctb,
-	rx_stats.avg_accuracy_ctb, rx_stats.pp_ctb, rx_stats.playtime_ctb,
+	rs.ranked_score_ctb, rs.total_score_ctb, rs.playcount_ctb,
+	us.replays_watched_ctb, us.total_hits_ctb,
+	rs.avg_accuracy_ctb, rs.pp_ctb, rs.playtime_ctb,
 
-	rx_stats.ranked_score_mania, rx_stats.total_score_mania, rx_stats.playcount_mania,
-	users_stats.replays_watched_mania, users_stats.total_hits_mania,
-	rx_stats.avg_accuracy_mania, rx_stats.pp_mania, rx_stats.playtime_mania,
+	rs.ranked_score_mania, rs.total_score_mania, rs.playcount_mania,
+	us.replays_watched_mania, us.total_hits_mania,
+	rs.avg_accuracy_mania, rs.pp_mania, rs.playtime_mania,
 
-	users.silence_reason, users.silence_end,
-	users.notes, users.ban_datetime, users.email
+	u.silence_reason, u.silence_end,
+	u.notes, u.ban_datetime, u.email
 
-FROM users
-LEFT JOIN users_stats
-ON users.id=users_stats.id
-LEFT JOIN rx_stats
-ON users.id=rx_stats.id
+FROM users as u
+LEFT JOIN users_stats as us ON u.id = us.id
+LEFT JOIN rx_stats as rs ON u.id = rs.id
 WHERE ` + whereClause + ` AND ` + md.User.OnlyUserPublic(true) + `
 LIMIT 1
 `
@@ -394,7 +392,7 @@ LIMIT 1
 
 // UserFullGET gets all of an user's information, with one exception: their userpage.
 func UserFullGET(md common.MethodData) common.CodeMessager {
-	shouldRet, whereClause, param := whereClauseUser(md, "users")
+	shouldRet, whereClause, param := whereClauseUser(md, "u")
 	if shouldRet != nil {
 		return *shouldRet
 	}
@@ -402,35 +400,34 @@ func UserFullGET(md common.MethodData) common.CodeMessager {
 	// Hellest query I've ever done.
 	query := `
 SELECT
-	users.id, users.username, users.register_datetime, users.privileges, users.latest_activity,
+	u.id, u.username, u.register_datetime, u.privileges, u.latest_activity,
 
-	users_stats.username_aka, users_stats.country, users_stats.play_style, users_stats.favourite_mode,
+	us.username_aka, us.country, us.play_style, us.favourite_mode,
 
-	users_stats.custom_badge_icon, users_stats.custom_badge_name, users_stats.can_custom_badge,
-	users_stats.show_custom_badge,
+	us.custom_badge_icon, us.custom_badge_name, us.can_custom_badge,
+	us.show_custom_badge,
 
-	users_stats.ranked_score_std, users_stats.total_score_std, users_stats.playcount_std,
-	users_stats.replays_watched_std, users_stats.total_hits_std,
-	users_stats.avg_accuracy_std, users_stats.pp_std, users_stats.playtime_std,
+	us.ranked_score_std, us.total_score_std, us.playcount_std,
+	us.replays_watched_std, us.total_hits_std,
+	us.avg_accuracy_std, us.pp_std, us.playtime_std,
 
-	users_stats.ranked_score_taiko, users_stats.total_score_taiko, users_stats.playcount_taiko,
-	users_stats.replays_watched_taiko, users_stats.total_hits_taiko,
-	users_stats.avg_accuracy_taiko, users_stats.pp_taiko, users_stats.playtime_taiko,
+	us.ranked_score_taiko, us.total_score_taiko, us.playcount_taiko,
+	us.replays_watched_taiko, us.total_hits_taiko,
+	us.avg_accuracy_taiko, us.pp_taiko, us.playtime_taiko,
 
-	users_stats.ranked_score_ctb, users_stats.total_score_ctb, users_stats.playcount_ctb,
-	users_stats.replays_watched_ctb, users_stats.total_hits_ctb,
-	users_stats.avg_accuracy_ctb, users_stats.pp_ctb, users_stats.playtime_ctb,
+	us.ranked_score_ctb, us.total_score_ctb, us.playcount_ctb,
+	us.replays_watched_ctb, us.total_hits_ctb,
+	us.avg_accuracy_ctb, us.pp_ctb, us.playtime_ctb,
 
-	users_stats.ranked_score_mania, users_stats.total_score_mania, users_stats.playcount_mania,
-	users_stats.replays_watched_mania, users_stats.total_hits_mania,
-	users_stats.avg_accuracy_mania, users_stats.pp_mania, users_stats.playtime_mania,
+	us.ranked_score_mania, us.total_score_mania, us.playcount_mania,
+	us.replays_watched_mania, us.total_hits_mania,
+	us.avg_accuracy_mania, us.pp_mania, us.playtime_mania,
 
-	users.silence_reason, users.silence_end,
-	users.notes, users.ban_datetime, users.email
+	u.silence_reason, u.silence_end,
+	u.notes, users.ban_datetime, u.email
 
-FROM users
-LEFT JOIN users_stats
-ON users.id=users_stats.id
+FROM users as u
+LEFT JOIN users_stats as us ON u.id = us.id
 WHERE ` + whereClause + ` AND ` + md.User.OnlyUserPublic(true) + `
 LIMIT 1
 `
@@ -541,12 +538,12 @@ type userpageResponse struct {
 
 // UserUserpageGET gets an user's userpage, as in the customisable thing.
 func UserUserpageGET(md common.MethodData) common.CodeMessager {
-	shouldRet, whereClause, param := whereClauseUser(md, "users_stats")
+	shouldRet, whereClause, param := whereClauseUser(md, "us")
 	if shouldRet != nil {
 		return *shouldRet
 	}
 	var r userpageResponse
-	err := md.DB.QueryRow("SELECT userpage_content FROM users_stats WHERE "+whereClause+" LIMIT 1", param).Scan(&r.Userpage)
+	err := md.DB.QueryRow("SELECT userpage_content FROM users_stats as us WHERE "+whereClause+" LIMIT 1", param).Scan(&r.Userpage)
 	switch {
 	case err == sql.ErrNoRows:
 		return common.SimpleResponse(404, "No such user!")

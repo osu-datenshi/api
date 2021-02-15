@@ -170,7 +170,7 @@ func addFriend(md common.MethodData, u int) common.CodeMessager {
 
 // userExists makes sure an user exists.
 func userExists(md common.MethodData, u int) (r bool) {
-	err := md.DB.QueryRow("SELECT EXISTS(SELECT 1 FROM users WHERE id = ? AND "+
+	err := md.DB.QueryRow("SELECT EXISTS(SELECT 1 FROM users as u WHERE id = ? AND "+
 		md.User.OnlyUserPublic(true)+")", u).Scan(&r)
 	if err != nil && err != sql.ErrNoRows {
 		md.Err(err)

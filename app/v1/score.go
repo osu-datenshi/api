@@ -30,6 +30,7 @@ type Score struct {
 	PlayMode   int                  `json:"play_mode"`
 	Accuracy   float64              `json:"accuracy"`
 	PP         float32              `json:"pp"`
+	DatenPP    float32              `json:"datenpp"`
 	Rank       string               `json:"rank"`
 	Completed  int                  `json:"completed"`
 }

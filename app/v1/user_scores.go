@@ -37,7 +37,7 @@ const masterScoreSelectBase = `
 			b.ranked_status_freezed, b.latest_update
 		FROM scores_master as s
 		INNER JOIN beatmaps as b ON b.beatmap_md5 = s.beatmap_md5
-		INNER JOIN users ON users.id = s.userid
+		INNER JOIN users as u ON u.id = s.userid
 		`
 
 const relaxScoreSelectBase = `
@@ -56,7 +56,7 @@ const relaxScoreSelectBase = `
 			b.ranked_status_freezed, b.latest_update
 		FROM scores_relax as s
 		INNER JOIN beatmaps as b ON b.beatmap_md5 = s.beatmap_md5
-		INNER JOIN users ON users.id = s.userid
+		INNER JOIN u as u ON users.id = s.userid
 		`
 
 const userScoreSelectBase = `
@@ -74,14 +74,14 @@ const userScoreSelectBase = `
 			b.max_combo, b.hit_length, b.ranked,
 			b.ranked_status_freezed, b.latest_update
 		FROM scores as s
-		INNER JOIN beatmaps ON b.beatmap_md5 = s.beatmap_md5
-		INNER JOIN users ON users.id = s.userid
+		INNER JOIN beatmaps as b ON b.beatmap_md5 = s.beatmap_md5
+		INNER JOIN users as u ON users.id = s.userid
 		`
 
 // UserScoresBestGET retrieves the best scores of an user, sorted by PP if
 // mode is standard and sorted by ranked score otherwise.
 func UserScoresBestGET(md common.MethodData) common.CodeMessager {
-	cm, wc, param := whereClauseUser(md, "users")
+	cm, wc, param := whereClauseUser(md, "u")
 	if cm != nil {
 		return *cm
 	}
@@ -137,7 +137,7 @@ func UserScoresBestGET(md common.MethodData) common.CodeMessager {
 
 // UserScoresRecentGET retrieves an user's latest scores.
 func UserScoresRecentGET(md common.MethodData) common.CodeMessager {
-	cm, wc, param := whereClauseUser(md, "users")
+	cm, wc, param := whereClauseUser(md, "u")
 	if cm != nil {
 		return *cm
 	}
