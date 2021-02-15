@@ -94,10 +94,10 @@ SELECT
 	s.time, s.play_mode, s.accuracy, s.pp,
 	s.completed,
 
-	u.id, u.username, u.register_datetime, u.privileges,
-	u.latest_activity, us.username_aka, us.country
+	users.id, users.username, users.register_datetime, users.privileges,
+	users.latest_activity, us.username_aka, us.country
 FROM scores_master as s
-INNER JOIN users as u ON u.id = s.userid
+INNER JOIN users ON users.id = s.userid
 INNER JOIN users_stats as us ON us.id = s.userid
 `+where.Clause, where.Params...)
 	if err != nil {

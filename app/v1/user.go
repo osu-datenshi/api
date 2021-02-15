@@ -22,17 +22,16 @@ type userData struct {
 	Country        string               `json:"country"`
 }
 
-const userFields = `SELECT u.id, u.username, register_datetime, u.privileges,
+const userFields = `SELECT users.id, users.username, register_datetime, users.privileges,
 	latest_activity, us.username_aka,
 	us.country
-FROM users as u
-INNER JOIN users_stats as us
-ON u.id=us.id
+FROM users
+INNER JOIN users_stats as us ON users.id = us.id
 `
 
 // UsersGET is the API handler for GET /users
 func UsersGET(md common.MethodData) common.CodeMessager {
-	shouldRet, whereClause, param := whereClauseUser(md, "u")
+	shouldRet, whereClause, param := whereClauseUser(md, "users")
 	if shouldRet != nil {
 		return userPutsMulti(md)
 	}
@@ -74,22 +73,22 @@ func userPutsMulti(md common.MethodData) common.CodeMessager {
 	pm := md.Ctx.Request.URI().QueryArgs().PeekMulti
 	// query composition
 	wh := common.
-		Where("u.username_safe = ?", common.SafeUsername(md.Query("nname"))).
-		Where("u.id = ?", md.Query("iid")).
-		Where("u.privileges = ?", md.Query("privileges")).
-		Where("u.privileges & ? > 0", md.Query("has_privileges")).
-		Where("u.privileges & ? = 0", md.Query("has_not_privileges")).
-		Where("u_stats.country = ?", md.Query("country")).
+		Where("users.username_safe = ?", common.SafeUsername(md.Query("nname"))).
+		Where("users.id = ?", md.Query("iid")).
+		Where("users.privileges = ?", md.Query("privileges")).
+		Where("users.privileges & ? > 0", md.Query("has_privileges")).
+		Where("users.privileges & ? = 0", md.Query("has_not_privileges")).
+		Where("us.country = ?", md.Query("country")).
 		Where("us.username_aka = ?", md.Query("name_aka")).
 		Where("pg.name = ?", md.Query("privilege_group")).
-		In("u.id", pm("ids")...).
-		In("u.username_safe", safeUsernameBulk(pm("names"))...).
+		In("users.id", pm("ids")...).
+		In("users.username_safe", safeUsernameBulk(pm("names"))...).
 		In("us.username_aka", pm("names_aka")...).
 		In("us.country", pm("countries")...)
 
 	var extraJoin string
 	if md.Query("privilege_group") != "" {
-		extraJoin = " LEFT JOIN privileges_groups as pg ON u.privileges & pg.privileges = pg.privileges "
+		extraJoin = " LEFT JOIN privileges_groups as pg ON users.privileges & pg.privileges = pg.privileges "
 	}
 
 	query := userFields + extraJoin + wh.ClauseSafe() + " AND " + md.User.OnlyUserPublic(true) +
@@ -250,7 +249,7 @@ type userNotFullResponse struct {
 
 // RelaxUserFullGET gets all of... bluh.. I'm tired...
 func RelaxUserFullGET(md common.MethodData) common.CodeMessager {
-	shouldRet, whereClause, param := whereClauseUser(md, "u")
+	shouldRet, whereClause, param := whereClauseUser(md, "users")
 	if shouldRet != nil {
 		return *shouldRet
 	}
@@ -258,7 +257,7 @@ func RelaxUserFullGET(md common.MethodData) common.CodeMessager {
 	// Hellest query I've ever done.
 	query := `
 SELECT
-	u.id, u.username, u.register_datetime, u.privileges, u.latest_activity,
+	users.id, users.username, users.register_datetime, users.privileges, users.latest_activity,
 
 	us.username_aka, us.country, us.play_style, us.favourite_mode,
 
@@ -281,12 +280,12 @@ SELECT
 	us.replays_watched_mania, us.total_hits_mania,
 	rs.avg_accuracy_mania, rs.pp_mania, rs.playtime_mania,
 
-	u.silence_reason, u.silence_end,
-	u.notes, u.ban_datetime, u.email
+	users.silence_reason, users.silence_end,
+	users.notes, users.ban_datetime, users.email
 
-FROM users as u
-LEFT JOIN users_stats as us ON u.id = us.id
-LEFT JOIN rx_stats as rs ON u.id = rs.id
+FROM users
+LEFT JOIN users_stats as us ON users.id = us.id
+LEFT JOIN rx_stats as rs ON users.id = rs.id
 WHERE ` + whereClause + ` AND ` + md.User.OnlyUserPublic(true) + `
 LIMIT 1
 `
@@ -392,7 +391,7 @@ LIMIT 1
 
 // UserFullGET gets all of an user's information, with one exception: their userpage.
 func UserFullGET(md common.MethodData) common.CodeMessager {
-	shouldRet, whereClause, param := whereClauseUser(md, "u")
+	shouldRet, whereClause, param := whereClauseUser(md, "users")
 	if shouldRet != nil {
 		return *shouldRet
 	}
@@ -400,7 +399,7 @@ func UserFullGET(md common.MethodData) common.CodeMessager {
 	// Hellest query I've ever done.
 	query := `
 SELECT
-	u.id, u.username, u.register_datetime, u.privileges, u.latest_activity,
+	users.id, users.username, users.register_datetime, users.privileges, users.latest_activity,
 
 	us.username_aka, us.country, us.play_style, us.favourite_mode,
 
@@ -423,11 +422,11 @@ SELECT
 	us.replays_watched_mania, us.total_hits_mania,
 	us.avg_accuracy_mania, us.pp_mania, us.playtime_mania,
 
-	u.silence_reason, u.silence_end,
-	u.notes, users.ban_datetime, u.email
+	users.silence_reason, users.silence_end,
+	users.notes, users.ban_datetime, users.email
 
-FROM users as u
-LEFT JOIN users_stats as us ON u.id = us.id
+FROM users
+LEFT JOIN users_stats as us ON users.id = us.id
 WHERE ` + whereClause + ` AND ` + md.User.OnlyUserPublic(true) + `
 LIMIT 1
 `

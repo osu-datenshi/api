@@ -46,11 +46,9 @@ SELECT
 	users_stats.username_aka,
 	users_stats.country
 FROM users_relationships
-LEFT JOIN users
-ON users_relationships.user2 = users.id
-LEFT JOIN users_stats
-ON users_relationships.user2=users_stats.id
-WHERE users_relationships.user1=?
+LEFT JOIN users ON users_relationships.user2 = users.id
+LEFT JOIN users_stats ON users_relationships.user2 = users_stats.id
+WHERE users_relationships.user1 = ?
 `
 
 	myFriendsQuery += common.Sort(md, common.SortConfiguration{
@@ -170,7 +168,7 @@ func addFriend(md common.MethodData, u int) common.CodeMessager {
 
 // userExists makes sure an user exists.
 func userExists(md common.MethodData, u int) (r bool) {
-	err := md.DB.QueryRow("SELECT EXISTS(SELECT 1 FROM users as u WHERE id = ? AND "+
+	err := md.DB.QueryRow("SELECT EXISTS(SELECT 1 FROM users WHERE id = ? AND "+
 		md.User.OnlyUserPublic(true)+")", u).Scan(&r)
 	if err != nil && err != sql.ErrNoRows {
 		md.Err(err)
