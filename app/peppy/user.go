@@ -12,7 +12,7 @@ import (
 	"github.com/thehowl/go-osuapi"
 	"github.com/valyala/fasthttp"
 	"gopkg.in/redis.v5"
-	"zxq.co/ripple/ocl"
+	"github.com/osu-datenshi/lib/ocl"
 	"github.com/osu-datenshi/api/common"
 )
 

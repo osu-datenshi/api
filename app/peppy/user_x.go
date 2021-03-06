@@ -8,7 +8,7 @@ import (
 	"github.com/valyala/fasthttp"
 	"gopkg.in/thehowl/go-osuapi.v1"
 	"github.com/osu-datenshi/api/common"
-	"github.com/osu-datenshi/getrank"
+	"github.com/osu-datenshi/lib/getrank"
 )
 
 // GetUserRecent retrieves an user's recent scores.

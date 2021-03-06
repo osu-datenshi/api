@@ -6,11 +6,11 @@ import (
 	"strings"
 	"syscall"
 
-	"zxq.co/ripple/agplwarning"
+	"github.com/osu-datenshi/lib/agplwarning"
 	"github.com/osu-datenshi/api/app"
 	"github.com/osu-datenshi/api/beatmapget"
 	"github.com/osu-datenshi/api/common"
-	"zxq.co/ripple/schiavolib"
+	"github.com/osu-datenshi/lib/schiavolib"
 	// Golint pls dont break balls
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"

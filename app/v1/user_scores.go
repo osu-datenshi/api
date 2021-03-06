@@ -7,7 +7,7 @@ import (
 	"gopkg.in/thehowl/go-osuapi.v1"
 	"database/sql"
 	"github.com/osu-datenshi/api/common"
-	"github.com/osu-datenshi/getrank"
+	"github.com/osu-datenshi/lib/getrank"
 )
 
 type userScore struct {

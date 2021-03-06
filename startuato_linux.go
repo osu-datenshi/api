@@ -11,7 +11,7 @@ import (
 	"github.com/rcrowley/goagain"
 	"github.com/valyala/fasthttp"
 	"github.com/osu-datenshi/api/common"
-	"zxq.co/ripple/schiavolib"
+	"github.com/osu-datenshi/lib/schiavolib"
 )
 
 func startuato(hn fasthttp.RequestHandler) {

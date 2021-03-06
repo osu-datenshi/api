@@ -8,7 +8,7 @@ import (
 	"unicode"
 
 	"github.com/jmoiron/sqlx"
-	"zxq.co/ripple/ocl"
+	"github.com/osu-datenshi/lib/ocl"
 	"github.com/osu-datenshi/api/common"
 )
 
